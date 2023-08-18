@@ -38,10 +38,33 @@ def main(input_source: str, model_path: str, anchors_path: str, class_file_path:
         for ID, name in enumerate(data):
             classes[ID] = name.strip('\n')
 
-    if input_source.isdigit():
-        process_video(sess, anchors, input_source, classes)
-    else:
+    try:
+        camera_index = int(input_source)
+        cap = cv2.VideoCapture(camera_index)
+        if cap.isOpened():
+            process_video(sess, anchors, camera_index, classes)
+            cap.release()
+            return
+    except ValueError:
+        pass
+
+    # Try to read as an image
+    image_test = cv2.imread(input_source)
+    if image_test is not None:
         process_image(sess, anchors, input_source, classes)
+        return
+
+    # Try to read as a video
+    cap = cv2.VideoCapture(input_source)
+    if cap.isOpened():
+        process_video(sess, anchors, input_source, classes)
+        cap.release()
+        return
+
+    print(
+        f"Failed to open the source: {input_source}. "
+        "Please provide a valid image, video, or camera index."
+    )
 
     cv2.destroyAllWindows()
 
