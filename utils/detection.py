@@ -8,7 +8,7 @@ Copyright (c) 2020 Jennifer Wang
 
 import cv2
 import numpy as np
-from typing import Any
+from typing import Any, Union
 
 from utils.preprocessing import image_preprocess
 from utils.postprocessing import postprocess_bbbox, postprocess_boxes, nms
@@ -72,21 +72,21 @@ def detect_objects(sess: Any, image: np.ndarray, anchors: np.ndarray, classes: d
     return draw_bbox(image, bboxes, classes)
 
 
-def process_video(sess: Any, anchors: np.ndarray, input_source: str, classes: dict) -> None:
+def process_video(sess: Any, anchors: np.ndarray, input_source: Union[str, int], classes: dict) -> None:
     """
     Process a video for object detection and display detected objects.
 
     Args:
         sess (Any): ONNX runtime session containing the model.
         anchors (np.ndarray): Array of anchor values for detection.
-        input_source (str): Path to the video file or device index.
+        input_source (Union[str, int]): Path to the video file or device index.
         classes (dict): Dictionary of class names.
 
     Returns:
         None
     """
 
-    cap = cv2.VideoCapture(int(input_source))
+    cap = cv2.VideoCapture(input_source)
     while cap.isOpened():
         ret, frame = cap.read()
         if ret:
