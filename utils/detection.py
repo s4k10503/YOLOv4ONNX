@@ -6,6 +6,7 @@ MIT License
 Copyright (c) 2020 Jennifer Wang
 """
 
+import time
 import cv2
 import numpy as np
 from typing import Any, Union
@@ -90,7 +91,15 @@ def process_video(sess: Any, anchors: np.ndarray, input_source: Union[str, int],
     while cap.isOpened():
         ret, frame = cap.read()
         if ret:
+            start_time = time.time()
             detected_image = detect_objects(sess, frame, anchors, classes)
+            end_time = time.time()
+
+            inference_time = (end_time - start_time) * 1000
+            inference_time_text = f"Inference time: {inference_time:.2f} ms"
+
+            cv2.putText(detected_image, inference_time_text, (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
             cv2.imshow('Detected Objects', detected_image)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
@@ -114,6 +123,15 @@ def process_image(sess: Any, anchors: np.ndarray, input_source: str, classes: di
     """
 
     image = cv2.imread(input_source)
+
+    start_time = time.time()
     detected_image = detect_objects(sess, image, anchors, classes)
+    end_time = time.time()
+
+    inference_time = (end_time - start_time) * 1000
+    inference_time_text = f"Inference time: {inference_time:.2f} ms"
+
+    cv2.putText(detected_image, inference_time_text, (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
     cv2.imshow('Detected Objects', detected_image)
     cv2.waitKey(0)
