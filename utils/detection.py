@@ -32,10 +32,13 @@ def get_anchors(anchors_path: str, tiny: bool = False) -> np.ndarray:
         anchors = f.readline()
     anchors = np.array(anchors.split(','), dtype=np.float32)
 
-    return anchors.reshape(3, 3, 2)
+    if tiny:
+        return anchors.reshape(2, 3, 2)
+    else:
+        return anchors.reshape(3, 3, 2)
 
 
-def detect_objects(sess: Any, image: np.ndarray, anchors: np.ndarray, classes: dict, input_size: int = 416) -> np.ndarray:
+def detect_objects(sess: Any, image: np.ndarray, anchors: np.ndarray, classes: dict, input_size: int = 416, tiny: bool = False) -> np.ndarray:
     """
     Detect objects in an image using a trained ONNX model.
 
@@ -45,6 +48,7 @@ def detect_objects(sess: Any, image: np.ndarray, anchors: np.ndarray, classes: d
         anchors (np.ndarray): Anchor values for detection.
         classes (dict): Dictionary containing class names.
         input_size (int, optional): Size of the input image after preprocessing. Defaults to 416.
+        tiny (bool, optional): If using YOLOv4 Tiny model. Defaults to False.
 
     Returns:
         np.ndarray: Image with detected objects and bounding boxes drawn.
@@ -63,8 +67,14 @@ def detect_objects(sess: Any, image: np.ndarray, anchors: np.ndarray, classes: d
     detections = sess.run(output_names, {input_name: image_data})
 
     # Post-process detections and draw bounding boxes
-    STRIDES = np.array([8, 16, 32])
-    XYSCALE = [1.2, 1.1, 1.05]
+
+    if tiny:
+        STRIDES = np.array([16, 32])
+        XYSCALE = [1.05, 1.05]
+    else:
+        STRIDES = np.array([8, 16, 32])
+        XYSCALE = [1.2, 1.1, 1.05]
+
     pred_bbox = postprocess_bbbox(detections, anchors, STRIDES, XYSCALE)
     bboxes = postprocess_boxes(
         pred_bbox, original_image_size, input_size, 0.25)
