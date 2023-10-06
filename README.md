@@ -44,12 +44,15 @@ To run the application inside a Docker container, execute the following command.
 docker run -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix -v /path/on/host:/path/in/container --device=/dev/video0:/dev/video0 yolov4_onnx
 ```
 
-Note: Replace /path/on/host and /path/in/container with the appropriate paths to mount the directory from your host machine into the container.
-Security Note: Before running the container, make sure to execute xhost + on the host machine to allow connections to the X server.
+Note: Replace /path/on/host and /path/in/container with the appropriate paths to mount the directory from your host machine into the container.  
+
+Security Note: Before running the container, make sure to execute xhost + on the host machine to allow connections to the X server.  
 
 ```bash
 xhost +
 ```
+
+After you are done, restrict the X server access again with:
 
 ```bash
 xhost -
