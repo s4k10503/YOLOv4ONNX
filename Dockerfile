@@ -29,6 +29,8 @@ RUN pip3 install --no-cache-dir \
 COPY setup.py /app/
 COPY main.py /app/
 COPY utils/ /app/utils/
+COPY model_data /app/model_data
+
 
 # Run the setup script to download the ONNX model
 RUN python3 setup.py
